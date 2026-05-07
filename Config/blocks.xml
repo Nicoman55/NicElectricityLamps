@@ -6,7 +6,7 @@
 			<property name="Extends" value="lightPorchWhite"/>
 			<property name="CreativeMode" value="None"/>
 			<property name="Class" value="ElectricityLamps.BlockElectricityLight, ElectricityLamps"/>
-			<property name="TakeDelay" value="5"/>
+			<property name="TakeDelay" value="7"/>
 			<property name="MaxDamage" value="500"/>
 			<property name="SellableToTrader" value="true"/>
 			<property name="Material" value="Mmetal"/>
@@ -284,16 +284,6 @@
 			<property name="UnlockedBy" value="craftingElectrician"/>
 			<property name="DescriptionKey" value="lightPlayerGroupDesc"/>
 			<property name="RuntimeSwitch" value="true"/>
-			<property name="TakeDelay" value="10"/>
-			<!-- <property class="RepairItems"> -->
-				<!-- <property name="resourceElectricParts" value="6"/> -->
-				<!-- <property name="resourceScrapIron" value="40"/> -->
-			<!-- </property> -->
-			<!-- <drop event="Harvest" name="resourceScrapIron" count="24,30" tag="allHarvest,perkJunkMiner"/> -->
-			<!-- <drop event="Harvest" name="terrStone" count="0" tool_category="Disassemble"/> -->
-			<!-- <drop event="Harvest" name="resourceElectricParts" count="3" tag="salvageHarvest"/> -->
-			<!-- <drop event="Destroy" count="0"/> -->
-			<!-- <drop event="Fall" name="scrapMetalPile" count="1" prob="0.75" stick_chance="1"/> -->
 			<property name="SortOrder1" value="B202"/>
 			<property name="SortOrder2" value="2900"/>
 			<property name="Group" value="Science,TCScience"/>
