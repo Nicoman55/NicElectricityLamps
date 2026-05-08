@@ -24,7 +24,7 @@ Adds a large collection of craftable, powered light blocks with full color, inte
 
 ## Requirements
 
-- 7 Days to Die **v2.4**
+- 7 Days to Die **v2.4** (minor playtesting results hint no problems with v2.6)
 - EAC must be **disabled**
 - [0_TFP_Harmony][2] mod installed
 
