@@ -35,8 +35,8 @@ Adds a large collection of craftable, powered light blocks with full color, inte
 
 ## Installation
 
-1. Download the mod
-2. Copy the mod folder into your `7 Days To Die\Mods\` directory
+1. Download the latest release `ElectricityLamps.zip`
+2. Unpack ElectricityLamps.zip into your `7 Days To Die\Mods\` directory
 3. The folder structure should look like:
 ```
 Mods\
@@ -83,12 +83,9 @@ When you interact with a placed light using the **Edit** command, the light opti
 
 > Note: only lights inside your land claim can be configured.
 
-### Power Warning
-The intensity and range labels turn **red** and a warning message appears when the total power consumption of the light exceeds the available capacity of the connected power source.
-
 ---
 
-## Power Consumption
+## Dynamic Power Consumption
 
 Power draw is calculated dynamically based on the light's current intensity and range settings:
 
@@ -97,6 +94,12 @@ PowerUsed = ceil(BasePower * IntensityFactor * RangeFactor)
 ```
 
 Where `BasePower` is 5W, `IntensityFactor` is the current intensity value, and `RangeFactor` is `range / 15`. Minimum consumption is 1W when the light is on, 0W when off.
+
+---
+
+
+### Power Warning
+The intensity and range labels turn **red** and a warning message appears when the total power consumption of the light exceeds the available capacity of the connected power source.
 
 ---
 
