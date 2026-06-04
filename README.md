@@ -29,7 +29,7 @@ Adds a large collection of craftable, powered light blocks with full color, inte
 - 0_TFP_Harmony mod installed
 
 ### Optional
-- [OcbElectricityOverhaul][2] — the mod is compatible with and extends this electricity overhaul
+- [OcbElectricityOverhaul][2] —  compatible with Electricity Lamps
 
 ---
 
