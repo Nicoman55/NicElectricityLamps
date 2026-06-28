@@ -403,6 +403,14 @@ namespace ElectricityLamps
             while (source.Parent is PowerSource parentSource)
                 source = parentSource;
 
+            // If the root power source is turned off, no overcapacity warning makes sense:
+            // consumers are not being powered anyway, so the warning would be a false positive.
+            // This is specifically needed when running alongside OcbElectricityOverhaul, which
+            // sets MaxGridProduction=0 when the source is off while ConsumerDemand still reflects
+            // all registered consumers, causing a spurious negative headroom calculation.
+            if (!source.IsOn)
+                return int.MaxValue;
+
             //Debug.Log($"[ElectricityLamps] Root type: {source.GetType().Name}");
 
             // Try OCB path via reflection
