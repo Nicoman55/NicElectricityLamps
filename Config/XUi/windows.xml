@@ -7,7 +7,7 @@
 			</panel>
 			<rect name="content" depth="0" pos="0,-46" height="534">
 				<sprite depth="4" name="backgroundMain" sprite="menu_empty3px" color="[black]" type="sliced" fillcenter="false" />
-				<sprite depth="1" color="[darkGrey]" type="sliced" width="228" height="534" pos="0,-3" />
+				<sprite depth="1" color="[darkGrey]" type="sliced" width="228" height="534" pos="0,0" />
 				<rect depth="2" pos="6,-5">
 					<grid name="stats" rows="9" cols="1" pos="3,-5" cell_width="222" cell_height="40" repeat_content="false" >
 					    <panel height="30" width="340" disableautobackground="true">

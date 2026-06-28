@@ -3,7 +3,7 @@
 	<Name value="ElectricityLamps"/>
 	<DisplayName value="Nic Electricity Lamps"/>
 	<Description value="Craft configurable lamps and spotlights." />
-	<Version value="1.0.1"/>
+	<Version value="1.0.2"/>
 	<Author value="Nico"/>
 	<Website value="https://github.com/Nicoman55/ElectricityLamps"/>
 </xml>
