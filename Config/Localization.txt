@@ -83,3 +83,5 @@ blockVariantHelperGroupDesc,UI,Menu,Colored lighting variants. Put crafted block
 ElectricityLampsT1,progression,Electrician,Colored Lights,Farbige Lichter
 
 ElectricityLampsPowerWarning,UI,Menu,Warning! Power limit exceeded!,Warnung! Leistungsgrenze überschritten!
+xuiCopySettings,UI,Menu,Copy Settings,Einstellungen kopieren
+xuiPasteSettings,UI,Menu,Paste Settings,Einstellungen einfügen

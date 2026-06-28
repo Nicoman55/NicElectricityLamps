@@ -114,5 +114,24 @@ namespace ElectricityLamps
                 te.Destroyed -= new XUiEvent_TileEntityDestroyed(this.TileEntity_Destroyed);
             }
         }
+
+        // Delegates copy button press to the stats controller.
+        // The on_press reflection system routes named rect presses to this top-level controller.
+        private void btnCopySettings_OnPressed(XUiController _sender, int _mouseButton)
+        {
+            this.ElectricityLampsStats?.btnCopySettings_OnPressed(_sender, _mouseButton);
+        }
+
+        // Delegates paste button press to the stats controller.
+        private void btnPasteSettings_OnPressed(XUiController _sender, int _mouseButton)
+        {
+            this.ElectricityLampsStats?.btnPasteSettings_OnPressed(_sender, _mouseButton);
+        }
+
+        // Delegates clear clipboard button press to the stats controller.
+        private void btnClearClipboard_OnPressed(XUiController _sender, int _mouseButton)
+        {
+            this.ElectricityLampsStats?.btnClearClipboard_OnPressed(_sender, _mouseButton);
+        }
     }
 }

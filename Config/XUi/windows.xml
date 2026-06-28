@@ -1,16 +1,15 @@
 <configs>
 	<append xpath="/windows">
-		<window name="windowElectricityLampsStats" width="228" height="511" panel="Left" controller="ElectricityLamps.XUiC_ElectricityLampsStats, ElectricityLamps" >
+		<window name="windowElectricityLampsStats" width="228" height="580" panel="Left" controller="ElectricityLamps.XUiC_ElectricityLampsStats, ElectricityLamps" >
 			<panel name="header" height="43" depth="1" backgroundspritename="ui_game_panel_header">
 				<sprite depth="2" name="windowIcon" style="icon32px" pos="5,-5" sprite="ui_game_symbol_resource"/>
 				<label style="header.name" text="OPTIONS" text_key="xuiLightOptions" />
 			</panel>
-			<rect name="content" depth="0" pos="0,-46" height="485">
-				<label name="lblPowerWarning" text_key="ElectricityLampsPowerWarning" font_size="24" color="[red]" width="228" height="30" pos="0,-457" justify="Center" visible="false" depth="3"/>
+			<rect name="content" depth="0" pos="0,-46" height="534">
 				<sprite depth="4" name="backgroundMain" sprite="menu_empty3px" color="[black]" type="sliced" fillcenter="false" />
-				<sprite depth="1" color="[darkGrey]" type="sliced" width="228" height="480" pos="0,-3" />
+				<sprite depth="1" color="[darkGrey]" type="sliced" width="228" height="534" pos="0,-3" />
 				<rect depth="2" pos="6,-5">
-					<grid name="stats" rows="8" cols="1" pos="3,-5" cell_width="222" cell_height="40" repeat_content="false" >
+					<grid name="stats" rows="9" cols="1" pos="3,-5" cell_width="222" cell_height="40" repeat_content="false" >
 					    <panel height="30" width="340" disableautobackground="true">
 						    <label text_key="xuiLightPropState" width ="180" font_size="22" pos ="2,-2" />
 						    <combobox name="cbxLightState" width ="130" height="30" type="ComboBoxEnum`1[LightStateType]" localization_prefix="xuiLightPropState" pos="80,-2" />
@@ -29,7 +28,7 @@
 						</panel>
 						<panel height="30" width="340" disableautobackground="true">
 							<label depth="1" width="180" pos="2,-2" name="lblRange" font_size="22" text="Intensity" text_key="xuiRange" />
-							<combobox name ="uiRange" type="ComboBoxFloat" width="130" height="30" pos="80,-2" value_increment="{LightRangeStep}" value_min="{MinLightRange}" value_max="{MaxLightRange}" value_wrap="false" format_string="0.00" />	
+							<combobox name ="uiRange" type="ComboBoxFloat" width="130" height="30" pos="80,-2" value_increment="{LightRangeStep}" value_min="{MinLightRange}" value_max="{MaxLightRange}" value_wrap="false" format_string="0.00" />
 						</panel>
 						<panel name="panelBeamAngle" height="30" width="340" disableautobackground="true">
 							<label depth="1" width="180" pos="2,-2" name="lblBeamAngle" font_size="22" text="Beam ∠" text_key="xuiAngle" />
@@ -53,6 +52,17 @@
 							</rect>
 						</panel>
 					</grid>
+				</rect>
+				<!-- Buttons anchored to the bottom of the window, outside the grid -->
+				<label name="lblPowerWarning" text_key="ElectricityLampsPowerWarning" font_size="24" color="[red]" width="228" height="30" pos="0,-462" justify="Center" visible="false" depth="3"/>
+				<rect name="btnCopySettings"  depth="3" pos="4,-497"  width="100" height="30" on_press="true" backgroundspritename="menu_empty3px" color="[dimgrey]">
+					<label text_key="xuiCopySettings"  font_size="18" width="100" height="30" justify="Center" depth="4" />
+				</rect>
+				<rect name="btnPasteSettings" depth="3" pos="108,-497" width="100" height="30" on_press="true" backgroundspritename="menu_empty3px" color="[dimgrey]">
+					<label text_key="xuiPasteSettings" font_size="18" width="100" height="30" justify="Center" depth="4" />
+				</rect>
+				<rect name="btnClearClipboard" depth="3" pos="213,-499" width="12" height="26" on_press="true" backgroundspritename="menu_empty3px" color="[darkred]">
+					<sprite depth="4" sprite="ui_game_symbol_x" color="255,255,255,255" width="8" height="8" pos="2,-9" style="icon22px" />
 				</rect>
 			</rect>
 		</window>

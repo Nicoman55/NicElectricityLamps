@@ -9,6 +9,24 @@ namespace ElectricityLamps
     // current lamp settings and state.
     public class XUiC_ElectricityLampsStats : XUiController
     {
+        // Holds a snapshot of light settings copied from one lamp so they
+        // can be pasted onto another lamp without closing the settings window.
+        private class LightSettingsClipboard
+        {
+            public int      LightMode;
+            public bool     IsSpotLight;
+            public float    LightIntensity;
+            public float    LightRange;
+            public ushort   LightKelvin;
+            public Color    LightColor;
+            public float    LightAngle;
+            public LightStateType LightState;
+            public float    Rate;
+            public float    Delay;
+        }
+
+        // Shared across all instances so the clipboard survives window open/close.
+        private static LightSettingsClipboard clipboard = null;
         public XUiC_ElectricityLampsWindowGroup Owner { get; set; }
 
         public TileEntityElectricityLightBlock TileEntity
@@ -71,6 +89,31 @@ namespace ElectricityLamps
             {
                 Debug.LogWarning("ElectricityLampsStats missing uiColorPicker");
             }
+
+            // Locate copy / paste buttons and subscribe to their OnPress events directly
+            btnCopySettings = GetChildById("btnCopySettings");
+            if (btnCopySettings != null)
+                btnCopySettings.OnPress += (sender, btn) => btnCopySettings_OnPressed(sender, btn);
+            else
+                Debug.LogWarning("ElectricityLampsStats missing btnCopySettings");
+
+            btnPasteSettings = GetChildById("btnPasteSettings");
+            if (btnPasteSettings != null)
+                btnPasteSettings.OnPress += (sender, btn) => btnPasteSettings_OnPressed(sender, btn);
+            else
+                Debug.LogWarning("ElectricityLampsStats missing btnPasteSettings");
+
+            btnClearClipboard = GetChildById("btnClearClipboard");
+            if (btnClearClipboard != null)
+                btnClearClipboard.OnPress += (sender, btn) => btnClearClipboard_OnPressed(sender, btn);
+            else
+                Debug.LogWarning("ElectricityLampsStats missing btnClearClipboard");
+
+            // Hide paste and clear buttons by default; they appear after the first copy
+            if (btnPasteSettings?.ViewComponent != null)
+                btnPasteSettings.ViewComponent.IsVisible = false;
+            if (btnClearClipboard?.ViewComponent != null)
+                btnClearClipboard.ViewComponent.IsVisible = false;
         }
 
         // Updates the lamp delay when the delay combo box changes.
@@ -141,6 +184,83 @@ namespace ElectricityLamps
         {
             UpdateTileEntityLight(tileEntity => tileEntity.IsKelvinScale = _newValue);
             ApplyVisibilityToUi();
+        }
+
+        // Copies all current light settings into the static clipboard and shows the paste button.
+        internal void btnCopySettings_OnPressed(XUiController _sender, int _mouseButton)
+        {
+            if (tileEntity == null)
+                return;
+
+            Audio.Manager.PlayButtonClick();
+
+            clipboard = new LightSettingsClipboard
+            {
+                LightMode      = (int)tileEntity.LightMode,
+                IsSpotLight    = tileEntity.IsSpotLight,
+                LightIntensity = tileEntity.LightIntensity,
+                LightRange     = tileEntity.LightRange,
+                LightKelvin    = tileEntity.LightKelvin,
+                LightColor     = tileEntity.LightColor,
+                LightAngle     = tileEntity.LightAngle,
+                LightState     = tileEntity.LightState,
+                Rate           = tileEntity.Rate,
+                Delay          = tileEntity.Delay,
+            };
+
+            if (btnPasteSettings?.ViewComponent != null)
+                btnPasteSettings.ViewComponent.IsVisible = true;
+            if (btnClearClipboard?.ViewComponent != null)
+                btnClearClipboard.ViewComponent.IsVisible = true;
+        }
+
+        // Applies all clipboard settings to the current light and refreshes the full UI.
+        internal void btnPasteSettings_OnPressed(XUiController _sender, int _mouseButton)
+        {
+            if (tileEntity == null || clipboard == null)
+                return;
+
+            Audio.Manager.PlayButtonClick();
+
+            UpdateTileEntityLight(te =>
+            {
+                // Only copy the Kelvin/color mode bit from the clipboard;
+                // preserve the spot/point light type of the target.
+                te.IsKelvinScale  = (clipboard.LightMode & 1) == 1;
+
+                te.LightIntensity = clipboard.LightIntensity;
+                te.LightRange     = clipboard.LightRange;
+                te.LightKelvin    = clipboard.LightKelvin;
+                te.LightColor     = clipboard.LightColor;
+                te.LightState     = clipboard.LightState;
+                te.Rate           = clipboard.Rate;
+                te.Delay          = clipboard.Delay;
+
+                // Only copy beam angle if both source and target are spotlights;
+                // a point light's internal angle value is meaningless on a spotlight.
+                if (clipboard.IsSpotLight && te.IsSpotLight)
+                    te.LightAngle = clipboard.LightAngle;
+
+                te.UpdateDynamicRequiredPower();
+            });
+
+            // Refresh all UI controls to show the newly pasted values
+            ApplyTileEntityValuesToUi();
+            ApplyVisibilityToUi();
+            ApplyPowerWarningColors();
+            RefreshBindings(false);
+        }
+
+        // Clears the clipboard and hides the paste and clear buttons.
+        internal void btnClearClipboard_OnPressed(XUiController _sender, int _mouseButton)
+        {
+            clipboard = null;
+            Audio.Manager.PlayButtonClick();
+
+            if (btnPasteSettings?.ViewComponent != null)
+                btnPasteSettings.ViewComponent.IsVisible = false;
+            if (btnClearClipboard?.ViewComponent != null)
+                btnClearClipboard.ViewComponent.IsVisible = false;
         }
 
         // Reads a block property and returns a fallback value when the property is missing.
@@ -233,17 +353,13 @@ namespace ElectricityLamps
         public override void OnOpen()
         {
             base.OnOpen();
-            // Debug.Log("ElectricityLampsStats OnOpen | TileEntity: " + (this.TileEntity != null));
             if (this.TileEntity == null)
             {
                 return;
             }
-            //Debug.Log("LightRange: " + this.TileEntity.LightRange + " | LightIntensity: " + this.TileEntity.LightIntensity);
-            //Debug.Log("BlockType: " + this.TileEntity.GetChunk().GetBlock(this.TileEntity.localChunkPos).type);
             BlockType = this.TileEntity.GetChunk().GetBlock(this.TileEntity.localChunkPos).type;
             ApplyBlockPropertyLimitsToUi();
 
-            //ApplyPowerLimitsToSliders();
             ApplyPowerWarningColors();
 
             ApplyTileEntityValuesToUi();
@@ -251,6 +367,12 @@ namespace ElectricityLamps
             this.TileEntity.SetUserAccessing(true);
             this.TileEntity.SetModified();
             RefreshBindings(false);
+
+            // Show paste and clear buttons only when clipboard has copied settings
+            if (btnPasteSettings?.ViewComponent != null)
+                btnPasteSettings.ViewComponent.IsVisible = (clipboard != null);
+            if (btnClearClipboard?.ViewComponent != null)
+                btnClearClipboard.ViewComponent.IsVisible = (clipboard != null);
         }
 
         // Saves UI changes and unlocks the tile entity when the window closes.
@@ -486,5 +608,8 @@ namespace ElectricityLamps
         private XUiC_ComboBoxFloat uiIntensity;
         private XUiC_ComboBoxFloat uiBeamAngle;
         private XUiC_ComboBoxFloat uiRange;
+        private XUiController btnCopySettings;
+        private XUiController btnPasteSettings;
+        private XUiController btnClearClipboard;
     }
 }
