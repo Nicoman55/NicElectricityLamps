@@ -169,6 +169,10 @@ All light properties (`LightIntensity`, `LightRange`, `LightMode` etc.) are inhe
 
 ## Changelog
 
+### Version 1.0.2
+- Fixed false power overload warning appearing in the light settings when the connected power source is turned off while OcbElectricityOverhaul is installed
+- Added copy/paste light settings feature — copy all settings from one light and paste them onto another without closing the settings window
+
 ### Version 1.0.1
 - Fixed unlock icon not showing in workbench
 - Fixed power consumption not updating correctly at power source after reload
