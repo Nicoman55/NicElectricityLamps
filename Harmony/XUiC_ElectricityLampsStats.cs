@@ -222,6 +222,12 @@ namespace ElectricityLamps
 
             Audio.Manager.PlayButtonClick();
 
+            // Snapshot the old RequiredPower before paste so the headroom check can
+            // correctly subtract this lamp's old share from the stale ConsumerDemand.
+            PowerConsumer pc = tileEntity.PowerItem as PowerConsumerToggle
+                            ?? tileEntity.PowerItem as PowerConsumer;
+            int oldRequiredPower = pc != null ? (int)pc.RequiredPower : 0;
+
             UpdateTileEntityLight(te =>
             {
                 // Only copy the Kelvin/color mode bit from the clipboard;
@@ -247,7 +253,7 @@ namespace ElectricityLamps
             // Refresh all UI controls to show the newly pasted values
             ApplyTileEntityValuesToUi();
             ApplyVisibilityToUi();
-            ApplyPowerWarningColors();
+            ApplyPowerWarningColors(oldRequiredPower);
             RefreshBindings(false);
         }
 
@@ -480,7 +486,9 @@ namespace ElectricityLamps
         }
 
         // Returns the remaining power headroom available on the network in watts.
-        private int GetAvailablePowerHeadroom()
+        // oldRequiredPower: if >= 0, overrides the value subtracted from ConsumerDemand
+        // to account for the fact that ConsumerDemand may not yet reflect a recent paste.
+        private int GetAvailablePowerHeadroom(int oldRequiredPower = -1)
         {
             if (this.TileEntity == null)
             {
@@ -548,27 +556,29 @@ namespace ElectricityLamps
                 int maxGrid = (int)(ushort)maxGridField.GetValue(source);
                 int gridDemand = (int)(ushort)gridDemandField.GetValue(source);
                 int consumerDemand = (int)(ushort)consumerDemandField.GetValue(source);
-                int totalDemand = gridDemand + consumerDemand;
-                int otherDemand = totalDemand - (int)powerConsumer.RequiredPower;
-                int headroom = maxGrid - otherDemand - (int)this.TileEntity.PowerUsed;
-                //Debug.Log($"[ElectricityLamps] OCB path: MaxGrid={maxGrid}, GridDemand={gridDemand}, ConsumerDemand={consumerDemand}, RequiredPower={powerConsumer.RequiredPower}, PowerUsed={this.TileEntity.PowerUsed}, Headroom={headroom}");
+                // ConsumerDemand is a network-wide value updated on the OCB tick, so it
+                // may be stale immediately after a paste. When oldRequiredPower is supplied,
+                // use it to subtract this lamp's pre-paste share from ConsumerDemand so
+                // we correctly isolate other consumers' load. Otherwise fall back to the
+                // current RequiredPower (which is accurate for slider changes).
+                int thisLampOldDemand = oldRequiredPower >= 0 ? oldRequiredPower : (int)powerConsumer.RequiredPower;
+                int otherDemand = consumerDemand - thisLampOldDemand;
+                int headroom = maxGrid - gridDemand - otherDemand - (int)this.TileEntity.PowerUsed;
                 return headroom;
             }
 
             // Vanilla path
             int otherConsumers = (int)source.LastPowerUsed - (int)powerConsumer.RequiredPower;
             int vanillaHeadroom = (int)source.MaxOutput - otherConsumers - (int)this.TileEntity.PowerUsed;
-            //Debug.Log($"[ElectricityLamps] Vanilla path: MaxOutput={source.MaxOutput}, LastPowerUsed={source.LastPowerUsed}, RequiredPower={powerConsumer.RequiredPower}, PowerUsed={this.TileEntity.PowerUsed}, Headroom={vanillaHeadroom}");
             return vanillaHeadroom;
         }
 
         // Colors the intensity and range labels red when power consumption exceeds
         // the available network headroom, restoring white when within limits.
-        private void ApplyPowerWarningColors()
+        // oldRequiredPower: if >= 0, used to correct stale ConsumerDemand after a paste.
+        private void ApplyPowerWarningColors(int oldRequiredPower = -1)
         {
-            int headroom = GetAvailablePowerHeadroom();
-
-            //Debug.Log($"[ElectricityLamps] Headroom: {headroom}, PowerUsed: {this.TileEntity?.PowerUsed ?? 0}");
+            int headroom = GetAvailablePowerHeadroom(oldRequiredPower);
 
             // Warn when there is no headroom left (network is at or over capacity)
             bool isExceeding = headroom != int.MaxValue && headroom <= 0;
@@ -586,14 +596,6 @@ namespace ElectricityLamps
             XUiController lblPowerWarning = GetChildById("lblPowerWarning");
             if (lblPowerWarning?.ViewComponent != null)
                 lblPowerWarning.ViewComponent.IsVisible = isExceeding;
-        }
-
-        // Delays the power warning color update by one frame to allow the power
-        // network to recalculate LastPowerUsed before we read it.
-        private System.Collections.IEnumerator ApplyPowerWarningColorsDelayed()
-        {
-            yield return null;
-            ApplyPowerWarningColors();
         }
 
         private int BlockType;
